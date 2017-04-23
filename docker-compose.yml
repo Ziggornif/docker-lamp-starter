@@ -1,0 +1,25 @@
+version: "2"
+services:
+  mysql:
+    image: mysql:5.7
+    container_name: mysql-APP
+    ports:
+        - "3306:3306"  
+    environment:
+        - MYSQL_ROOT_PASSWORD=ROOTPASSWORD
+        - MYSQL_DATABASE=DATABASE
+        - MYSQL_USER=USER
+        - MYSQL_PASSWORD=USERPASSWORD
+    volumes:
+        - ./conf/SQLDUMP.sql:/docker-entrypoint-initdb.d/init.sql
+  apache:
+    build: ./.docker/apache-php
+    container_name: apache-APP
+    links:
+        - mysql
+    ports:
+        - "8080:80"
+    privileged: true
+    volumes:
+        - ./site/:/var/www/html
+        - ./conf/APP.conf:/etc/apache2/sites-available/000-default.conf
